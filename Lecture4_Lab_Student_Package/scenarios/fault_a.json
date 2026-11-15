@@ -1,0 +1,23 @@
+{
+  "title": "Fault A wrong store address",
+  "pc": "0x8",
+  "registers": {
+    "x10": "0x1000",
+    "x6": 12
+  },
+  "memory": {
+    "0x1000": 7,
+    "0x1004": 0,
+    "0x100c": 0
+  },
+  "program": [
+    {
+      "pc": "0x8",
+      "asm": "sw x6, 4(x10)"
+    }
+  ],
+  "steps": 1,
+  "faults": {
+    "ALUSrc": 0
+  }
+}

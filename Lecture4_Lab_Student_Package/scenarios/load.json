@@ -1,0 +1,20 @@
+{
+  "title": "Independent clean load",
+  "pc": "0x0",
+  "registers": {
+    "x10": "0x1000",
+    "x5": 0
+  },
+  "memory": {
+    "0x1000": 7,
+    "0x1004": 0,
+    "0x100c": 0
+  },
+  "program": [
+    {
+      "pc": "0x0",
+      "asm": "lw x5, 0(x10)"
+    }
+  ],
+  "steps": 1
+}

@@ -1,0 +1,23 @@
+{
+  "title": "Fault C missing branch redirection",
+  "pc": "0x20",
+  "registers": {
+    "x6": 12,
+    "x11": 12
+  },
+  "memory": {
+    "0x1000": 7,
+    "0x1004": 0,
+    "0x100c": 0
+  },
+  "program": [
+    {
+      "pc": "0x20",
+      "asm": "beq x6, x11, 12"
+    }
+  ],
+  "steps": 1,
+  "faults": {
+    "PCSel": 0
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "title": "Branch controlled loop",
+  "pc": "0x20",
+  "registers": {
+    "x6": 0,
+    "x2": 1,
+    "x11": 2
+  },
+  "memory": {
+    "0x1000": 7,
+    "0x1004": 0,
+    "0x100c": 0
+  },
+  "program": [
+    {
+      "pc": "0x20",
+      "asm": "add x6, x6, x2"
+    },
+    {
+      "pc": "0x24",
+      "asm": "beq x6, x11, 8"
+    },
+    {
+      "pc": "0x28",
+      "asm": "beq x0, x0, -8"
+    }
+  ],
+  "steps": 8
+}

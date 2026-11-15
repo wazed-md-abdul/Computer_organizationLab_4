@@ -1,0 +1,6 @@
+instruction,RegWrite,ALUSrc,MemWrite,WBsel,Branch,PCSel,reason for each dont care
+add,,,,,,,
+lw,,,,,,,
+sw,,,,,,,
+beq with Eq=0,,,,,,,
+beq with Eq=1,,,,,,,

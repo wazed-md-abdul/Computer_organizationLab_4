@@ -1,0 +1,21 @@
+{
+  "title": "Independent add before and after the edge",
+  "pc": "0x4",
+  "registers": {
+    "x5": 7,
+    "x2": 5,
+    "x6": 99
+  },
+  "memory": {
+    "0x1000": 7,
+    "0x1004": 0,
+    "0x100c": 0
+  },
+  "program": [
+    {
+      "pc": "0x4",
+      "asm": "add x6, x5, x2"
+    }
+  ],
+  "steps": 1
+}
