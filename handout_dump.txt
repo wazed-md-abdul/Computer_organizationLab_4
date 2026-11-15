@@ -1,0 +1,224 @@
+=== DOC: Lecture4_Lab_Student_Handout.docx ===
+P0 [Title]: Lecture 4 Lab Session
+P1 [Subtitle]: CPU Datapath and Control
+P2 [Normal]: Student handout | 120 minutes | individual report
+P3 [Normal]: Name ____________________  Student ID ____________________  Date __________
+P4 [Normal]: In this lab, you will explain how a single-cycle CPU carries out an instruction. Predict the values on its active paths, identify the controls that route those values, and distinguish a signal being ready from a register or memory word being updated. Use the Lecture 4 load–add–store example as your reference throughout.
+P5 [Heading 2]: Learning outcomes
+P6 [Normal]: 1. Trace add, lw, sw and beq through the lecture datapath.
+P7 [Normal]: 2. Explain selection controls, write enables and updates at the rising clock edge.
+P8 [Normal]: 3. Use internal observations to identify the first incorrect effect of a control fault.
+P9 [Normal]: 4. Calculate a fixed clock period from dependent paths and evaluate an optimization.
+P10 [Heading 2]: Session schedule
+P12 [Heading 2]: Prepare before class
+P13 [Normal]: Review Lecture 4 slides 25–29, 35–39, 46–56, 61–76 and 77–94 in the integrated 96-slide edition. Have Ripes and Python 3 available. Download and extract the student package before starting; no Python packages need to be installed.
+P14 [Normal]: Work with a partner when exploring, but write your own predictions, observations and explanations. Complete the report template as you work. Each experiment starts from fresh initial state.
+P15 [Heading 1]: Setup and the course model
+P16 [Normal]: Time 10 minutes | Files in the student package
+P17 [Normal]: 1. In Ripes, select RISC-V 32-bit and the Single-cycle processor. Use the Extended layout when available. Disable the compressed C extension for the four-byte address calculations in this lab.
+P18 [Normal]: 2. Open 01_load_add_store.s. Find the Editor, Processor and Memory views. Set a breakpoint at trace_start in the assembled instruction listing. Run to it; do not execute the instruction at that label yet.
+P19 [Normal]: 3. Record B, the actual address of source_word, and S, the actual address of trace_start. Use B and S in Ripes answers. The course tracer uses B=0x1000 and S=0 for the same first three instructions.
+P20 [Normal]: 4. Open a terminal in the student package folder. Run the command below. On Windows, replace python3 with py -3 when needed. Read the before, signals and after sections for the first cycle.
+P21 [Normal]: python3 lab4_cpu.py --scenario sequence --steps 1
+P22 [Normal]: The supplied Python program is a functional teaching model of the lecture circuit. It reports settled signals and the following edge update; it does not simulate propagation delays or a complete RISC-V machine. No simulator source-code editing is required.
+P24 [Normal]: Ripes can use different internal labels, selector encodings or branch hardware. Compare architectural register, memory and PC results first. Use the course tracer and this table for exact lecture control values. The setup instructions and stopping markers in the Ripes files are outside the measured regions.
+P25 [Heading 1]: Task A Trace load add and store
+P26 [Normal]: Time 25 minutes | 01_load_add_store.s | Lecture slides 35–56 and 86–88
+P27 [Normal]: At trace_start: x10=B, x2=5, x5=0, x6=0, M[B]=7 and M[B+4]=0. M[a] means the 32-bit word beginning at byte address a. All values below are decimal unless prefixed by 0x.
+P28 [Normal]: trace_start: lw  x5, 0(x10)
+             add x6, x5, x2
+             sw  x6, 4(x10)
+lab_done:    add x0, x0, x0   # stop BEFORE this marker
+P29 [Normal]: 1. Predict the state after each of the three instructions. Keep the setup and lab_done marker outside your count.
+P30 [Normal]: 2. In Ripes, clock one instruction at a time. Before each clock, inspect its source values and active route; after the clock, record the changed state. Stop on reaching lab_done.
+P31 [Normal]: 3. Run the course tracer for three cycles. Compare the memory address, store data, write-back data and next PC with your prediction. The tracer labels before and after describe the same instruction, not different instructions.
+P32 [Normal]: python3 lab4_cpu.py --scenario sequence --steps 3 --csv task_a.csv
+P35 [Normal]: A1  A load has produced 7 at the memory output. Why can x5 still be 0?
+P36 [Normal]: ________________________________________________________________________
+P37 [Normal]: A2  For the store, distinguish where to write from what to write.
+P38 [Normal]: ________________________________________________________________________
+P39 [Normal]: A3  Why does the add read the new x5 without a stall in this model?
+P40 [Normal]: ________________________________________________________________________
+P41 [Normal]: Checkpoint: show the load’s before/signals/after record and the final stored word to your partner. A highlighted wire alone is not evidence that stored state changed.
+P42 [Heading 1]: Task B Complete the control table
+P43 [Normal]: Time 15 minutes | control_table_blank.csv | Lecture slides 67–76
+P44 [Normal]: Fill the table before using the tracer. Write X only when either selector value preserves the required architectural result in this specific datapath. A disabled write must be 0, not X. PCSel is the actual next-PC selection, not simply the instruction class.
+P46 [Normal]: 1. Check add, lw and sw against the three records from Task A. Explain each row using the destination that must change.
+P47 [Normal]: 2. Explain why the store needs its second register value even though ALUSrc selects an immediate.
+P48 [Normal]: 3. For beq, locate the dedicated equality comparator and branch-target adder in the course model. Decide whether the unused main-ALU input affects the branch result.
+P49 [Normal]: 4. Compare the Boolean choices used by the tracer with your X entries. A concrete 0 or 1 can be a valid implementation of a don’t-care selector.
+P50 [Heading 2]: Decode one store
+P51 [Normal]: The machine word 0x00652223 encodes sw x6, 4(x10). Split its fields and explain how the decoder knows that this is a word store. You may use the assembled listing or a calculator to inspect bits.
+P53 [Normal]: B1  Why are bits 11:7 not a destination-register number for this instruction?
+P54 [Normal]: ________________________________________________________________________
+P55 [Normal]: B2  What extra field, beyond opcode and funct3, distinguishes add from sub?
+P56 [Normal]: ________________________________________________________________________
+P57 [Normal]: Checkpoint: explain one selector and one write enable without describing either as a data value.
+P58 [Heading 1]: Task C Branches and signed offsets
+P59 [Normal]: Time 20 minutes | 02_branch.s and 03_negative_store.s | Slides 61–66, 89 and 94
+P60 [Heading 2]: C1 Compare both branch outcomes
+P61 [Normal]: The branch follows the three instructions from Task A. In the course tracer its PC is 0x0C and its byte displacement is +12. Reset independently for x11=12 and x11=9. Predict both candidate addresses before checking the condition.
+P62 [Normal]: python3 lab4_cpu.py --scenario taken
+python3 lab4_cpu.py --scenario not_taken
+P64 [Normal]: In 02_branch.s, change the immediate on the INPUT_X11 line to 12 or 9 and reassemble/reset each time. Clock exactly the three data instructions and the beq from trace_start. Record the PC immediately after the branch, before executing either path. If S is trace_start, the two candidates are S+16 and S+24.
+P65 [Normal]: C1a  Which register or memory word does beq write? What changes instead?
+P66 [Normal]: ________________________________________________________________________
+P67 [Normal]: C1b  Why would adding the offset to PC+4 give the wrong target here?
+P68 [Normal]: ________________________________________________________________________
+P69 [Heading 2]: C2 Trace the negative store from the lecture
+P70 [Normal]: This is a separate initial state: PC=0x20, x10=0x1008, x6=12 and M[0x1004]=3. Execute sw x6, -4(x10). Give the immediate as signed decimal and as a 32-bit hexadecimal value, then predict the address, store data and next PC.
+P71 [Normal]: python3 lab4_cpu.py --scenario store_checkpoint
+P72 [Normal]: Verify the same operation in 03_negative_store.s. If B is slot, the wrapper sets x10=B+4 and M[B]=3. Use the actual Ripes PC rather than forcing it to 0x20.
+P74 [Normal]: Checkpoint: explain why changing the address calculation does not change the source of store data.
+P75 [Heading 1]: Task D Diagnose control faults
+P76 [Normal]: Time 25 minutes | Course tracer | Lecture slides 91–93
+P77 [Normal]: Each case is an independent run with one stuck control and otherwise correct hardware. First use the observations below to infer the fault. Then run the named case, find the earliest incorrect signal or missing edge update, and compare it with the corresponding clean run. Seeing only a wrong final value is not a complete diagnosis.
+P79 [Normal]: python3 lab4_cpu.py --scenario fault_a
+python3 lab4_cpu.py --scenario fault_b
+python3 lab4_cpu.py --scenario fault_c
+P80 [Normal]: Use --scenario store, load or branch for the clean comparison. All scenario commands begin with freshly initialized registers and memory. Record the faulty control, its stuck value, the expected value and the first differing effect.
+P82 [Heading 2]: D1 Separate routing from permission
+P83 [Normal]: python3 lab4_cpu.py --scenario store --fault MemWrite=0
+P84 [Normal]: Predict whether the address and store-data wires remain correct. Compare the memory word before and after the edge. Explain how this differs from case A.
+P85 [Heading 2]: D2 Test a don’t-care selector
+P86 [Normal]: python3 lab4_cpu.py --scenario store --fault WBsel=0
+python3 lab4_cpu.py --scenario store --fault WBsel=1
+P87 [Normal]: Compare architectural state after the two runs. Explain why a different value on an unused write-back path need not change the result. Do not conclude that WBsel is irrelevant for lw.
+P88 [Normal]: D3  Why is “x5 stayed zero” alone insufficient to identify a unique fault?
+P89 [Normal]: ________________________________________________________________________
+P90 [Heading 1]: Task E Calculate timing budgets
+P91 [Normal]: Time 20 minutes | Lecture slides 79–85 | Calculator or paper
+P92 [Normal]: These are illustrative timing budgets, not measured Ripes or Python execution times. Relevant control and selector arrivals are included in the stated budgets; every other required path is assumed no longer than the largest listed path. The single-cycle processor uses one fixed clock period.
+P94 [Normal]: 1. Add the dependent load-route delays. The add route skips the 250 ps data-memory read. Find both budgets.
+P95 [Normal]: 2. A dedicated branch path has a complete budget of 760 ps. Choose the fixed period, calculate frequency in GHz, and find the ideal time for 100 completed instructions at CPI=1.
+P96 [Normal]: 3. Reduce the main ALU delay from 150 ps to 100 ps. Its change affects the load and add routes. The branch has separate hardware and stays at 760 ps. Recalculate the period and the speedup for the same program.
+P98 [Normal]: E1  Why can the clock improve by less than the 50 ps saved in the ALU?
+P99 [Normal]: ________________________________________________________________________
+P100 [Heading 2]: E2 Signals that meet at a multiplexer
+P101 [Normal]: Two data inputs are ready at 260 ps and 320 ps; select is ready at 410 ps. The mux delay is 30 ps. Use the conservative rule: output arrival equals the maximum input/select arrival plus mux delay. Recalculate if select becomes ready at 300 ps.
+P102 [Normal]: Explain why the three arrival times are compared rather than added.
+P103 [Normal]: ________________________________________________________________________
+P104 [Heading 1]: Submission and exit ticket
+P105 [Normal]: Time 5 minutes | Use report_template.md or Lecture4_Lab_Report_Template.docx
+P106 [Normal]: Submit an individual report with predictions, observations and explanations. Attach task_a.csv and one useful fault trace or annotated screenshot. Include your name and student ID. Screenshots support your reasoning; explain the values in words. Use the deadline and collection method announced by your instructor.
+P108 [Heading 2]: Exit ticket
+P109 [Normal]: 1. For lw, which value is an address and which value is written to rd?
+P110 [Normal]: 2. Can a correct value on a wire update a register when RegWrite=0?
+P111 [Normal]: 3. In this lecture’s beq path, what two conditions make PCSel=1?
+P112 [Normal]: 4. Why can CPI=1 still correspond to a slow processor?
+P113 [Heading 2]: Optional loop after the session
+P114 [Normal]: Slide 90 uses x6=0, x2=1 and x11=2. Predict the visited PCs and x6 after each instruction. Stop on first reaching 0x2C, before executing anything there.
+P115 [Normal]: 0x20: add x6, x6, x2
+0x24: beq x6, x11, +8
+0x28: beq x0, x0, -8
+
+python3 lab4_cpu.py --scenario loop
+P116 [Normal]: The +8 and -8 above are decoded byte displacements in the teaching listing. The optional Ripes file 04_loop_optional.s uses labels. Explain why the backward branch needs no register or memory write.
+P117 [Heading 2]: References
+P118 [Normal]: Course source: Lecture 4 CPU Datapath and Control, integrated 96-slide edition. The lab preserves its selector conventions and examples, including slides 86–94. The trace program and exercises are course materials.
+P119 [Normal]: Ripes official downloads: https://github.com/mortbopet/Ripes/releases
+Ripes interface guide: https://github.com/mortbopet/Ripes/blob/master/docs/introduction.md
+RISC-V RV32I specification: https://docs.riscv.org/reference/isa/unpriv/rv32.html
+
+--- TABLE 0 ---
+R0: Activity | Minutes
+R1: Setup and model check | 10
+R2: A  Trace load add and store | 25
+R3: B  Complete the control table | 15
+R4: C  Branches and signed offsets | 20
+R5: D  Diagnose control faults | 25
+R6: E  Calculate timing budgets | 20
+R7: Report check and exit ticket | 5
+
+--- TABLE 1 ---
+R0: Item | Convention used in this lab
+R1: State and access | 32-bit integer registers; x0 always zero; separate instruction and data memories; aligned 4-byte word accesses.
+R2: Timing | Combinational reads; enabled register and memory writes commit at the ending rising edge. Every supported instruction uses one fixed cycle.
+R3: ALU input | ALUSrc=0 selects the second register value; ALUSrc=1 selects the signed immediate. The main ALU adds.
+R4: Write back | WBsel=0 selects the ALU result; WBsel=1 selects the memory result. RegWrite enables the destination update.
+R5: Store and branch | MemWrite enables a store. A dedicated comparator produces Eq; a separate adder computes PC+immediate. PCSel=Branch AND Eq.
+R6: Address units | PC and memory addresses count bytes. The decoded branch immediate is already a signed byte offset; do not shift it again.
+
+--- TABLE 2 ---
+R0: After instruction | PC | x5 | x6 | M[B] | M[B+4]
+R1: lw x5, 0(x10) |  |  |  |  | 
+R2: add x6, x5, x2 |  |  |  |  | 
+R3: sw x6, 4(x10) |  |  |  |  | 
+
+--- TABLE 3 ---
+R0: Quantity | Prediction | Observation
+R1: Load ALU result |  | 
+R2: Load memory output and write-back input |  | 
+R3: x5 before the load completion edge |  | 
+R4: Store effective address |  | 
+R5: Store write-data input |  | 
+R6: Registers changed by the store |  | 
+
+--- TABLE 4 ---
+R0: Instruction | RegWrite | ALUSrc | MemWrite | WBsel | Branch | PCSel
+R1: add |  |  |  |  |  | 
+R2: lw |  |  |  |  |  | 
+R3: sw |  |  |  |  |  | 
+R4: beq equal |  |  |  |  |  | 
+R5: beq unequal |  |  |  |  |  | 
+
+--- TABLE 5 ---
+R0: Field | Bit positions | Your value
+R1: opcode | 6:0 | 
+R2: funct3 | 14:12 | 
+R3: rs1 | 19:15 | 
+R4: rs2 | 24:20 | 
+R5: imm[11:5] | 31:25 | 
+R6: imm[4:0] | 11:7 | 
+
+--- TABLE 6 ---
+R0: x11 | Eq | PC+4 | PC+12 | PCSel | PC after edge
+R1: 12 |  |  |  |  | 
+R2: 9 |  |  |  |  | 
+
+--- TABLE 7 ---
+R0: Observation | Prediction | Observed
+R1: Immediate and effective address |  | 
+R2: Memory before and after the edge |  | 
+R3: x10 and x6 after the edge |  | 
+R4: PC after the edge |  | 
+
+--- TABLE 8 ---
+R0: Case | Given observations | Clean comparison
+R1: A | sw x6,4(x10); x10=0x1000, x6=12. Memory receives 12 at 0x100C instead of 0x1004. | store
+R2: B | lw x5,0(x10); memory output and register write-data input are both 7. x5 stays 0, while PC advances. | load
+R3: C | beq at PC=0x20; byte offset +12; source values equal; Branch=1 and target=0x2C verified. PC becomes 0x24. | branch
+
+--- TABLE 9 ---
+R0: Case | Fault and value | First differing effect | Evidence after repair
+R1: A |  |  | 
+R2: B |  |  | 
+R3: C |  |  | 
+
+--- TABLE 10 ---
+R0: Part of the dependent load route | Delay in ps
+R1: Launch delay | 30
+R2: Instruction access and decode | 200
+R3: Register-file access | 100
+R4: Main ALU | 150
+R5: Data-memory read | 250
+R6: Write-back selection | 30
+R7: Setup and timing margin | 40
+
+--- TABLE 11 ---
+R0: Quantity | Before optimization | After optimization
+R1: Load path in ps |  | 
+R2: Add path in ps |  | 
+R3: Branch path in ps | 760 | 760
+R4: Fixed period in ps |  | 
+R5: Clock frequency in GHz |  | 
+R6: Time for 100 instructions in ns |  | 
+
+--- TABLE 12 ---
+R0: Evidence | Suggested points
+R1: A  State trace and before-edge versus after-edge explanation | 25
+R2: B  Control table and store-field decoding | 15
+R3: C  Both branch outcomes and negative-offset store | 20
+R4: D  Three diagnoses with evidence and clean comparisons | 25
+R5: E  Timing calculations and optimization explanation | 10
+R6: Clear report and exit ticket | 5

@@ -1,0 +1,110 @@
+=== DOC: Lecture4_Lab_Student_Package/Lecture4_Lab_Report_Template.docx ===
+P0 [Title]: Lecture 4 Lab Report
+P1 [Subtitle]: CPU Datapath and Control
+P2 [Normal]: Name ____________________ Student ID ____________________ Date __________
+P3 [Normal]: Record predictions before running. Add observations and explanations afterwards. Expand the response areas as needed. Use actual Ripes addresses B and S; show course-model addresses separately.
+P4 [Normal]: Environment  Ripes version and selected processor; Python version; actual B and S
+P5 [Normal]: ________________________________________________________________________
+P6 [Heading 2]: A Load add store evidence
+P8 [Normal]: Load  Address, memory output, x5 before edge and x5 after edge
+P9 [Normal]: ________________________________________________________________________
+P10 [Normal]: ________________________________________________________________________
+P11 [Normal]: Store  Address and data routes; registers preserved
+P12 [Normal]: ________________________________________________________________________
+P13 [Normal]: ________________________________________________________________________
+P14 [Normal]: Why no stall is needed in this single-cycle sequence
+P15 [Normal]: ________________________________________________________________________
+P16 [Heading 1]: B Controls and instruction fields
+P18 [Normal]: Justify X entries and explain rs2 in a store
+P19 [Normal]: ________________________________________________________________________
+P20 [Normal]: ________________________________________________________________________
+P21 [Normal]: ________________________________________________________________________
+P23 [Normal]: Decode 0x00652223  Reconstruct the signed store immediate
+P24 [Normal]: ________________________________________________________________________
+P25 [Normal]: ________________________________________________________________________
+P26 [Normal]: Explain S-format bits 11:7 and the add versus sub distinction
+P27 [Normal]: ________________________________________________________________________
+P28 [Normal]: ________________________________________________________________________
+P29 [Heading 1]: C Branch and signed offset evidence
+P31 [Normal]: Explain the branch base address and state preserved
+P32 [Normal]: ________________________________________________________________________
+P33 [Normal]: ________________________________________________________________________
+P34 [Normal]: Negative store  Signed and hexadecimal immediate; effective address; memory before and after; unchanged registers; next PC
+P35 [Normal]: ________________________________________________________________________
+P36 [Normal]: ________________________________________________________________________
+P37 [Normal]: ________________________________________________________________________
+P38 [Heading 2]: D Fault diagnosis evidence
+P40 [Normal]: D1 MemWrite=0  Which signals remain correct and which update is missing?
+P41 [Normal]: ________________________________________________________________________
+P42 [Normal]: ________________________________________________________________________
+P43 [Normal]: D2 WBsel=0 versus 1 for store  Compare architectural state and explain
+P44 [Normal]: ________________________________________________________________________
+P45 [Normal]: ________________________________________________________________________
+P46 [Normal]: D3 Why the internal observations are needed for a unique diagnosis
+P47 [Normal]: ________________________________________________________________________
+P48 [Normal]: ________________________________________________________________________
+P49 [Normal]: Attach one fault trace or annotated screenshot. Identify the PC and whether it shows the state before or after the edge.
+P50 [Heading 1]: E Timing and final checks
+P52 [Normal]: Show the load sum and speedup calculation
+P53 [Normal]: ________________________________________________________________________
+P54 [Normal]: ________________________________________________________________________
+P55 [Normal]: Explain why the critical path changes
+P56 [Normal]: ________________________________________________________________________
+P57 [Normal]: ________________________________________________________________________
+P58 [Normal]: Mux arrivals  Original result, improved result and reasoning
+P59 [Normal]: ________________________________________________________________________
+P60 [Normal]: ________________________________________________________________________
+P61 [Heading 2]: Exit ticket
+P62 [Normal]: 1  For lw, distinguish the address from the write-back value
+P63 [Normal]: ________________________________________________________________________
+P64 [Normal]: 2  Explain the effect of RegWrite=0
+P65 [Normal]: ________________________________________________________________________
+P66 [Normal]: 3  State the conditions for PCSel=1
+P67 [Normal]: ________________________________________________________________________
+P68 [Normal]: 4  Explain why CPI=1 does not guarantee a fast processor
+P69 [Normal]: ________________________________________________________________________
+P70 [Heading 2]: Submission check
+P71 [Normal]: Include task_a.csv and one fault trace or screenshot. Confirm that predictions and observations are distinguishable and that each independent run was reset. Optional loop work may be attached after these required tasks.
+
+--- TABLE 0 ---
+R0: Op | Predicted state | Observed state | Explanation of changes
+R1: lw |  |  | 
+R2: add |  |  | 
+R3: sw |  |  | 
+
+--- TABLE 1 ---
+R0: Instruction | RegWrite | ALUSrc | MemWrite | WBsel | Branch | PCSel
+R1: add |  |  |  |  |  | 
+R2: lw |  |  |  |  |  | 
+R3: sw |  |  |  |  |  | 
+R4: beq equal |  |  |  |  |  | 
+R5: beq unequal |  |  |  |  |  | 
+
+--- TABLE 2 ---
+R0: Field | Bit positions | Your value
+R1: opcode | 6:0 | 
+R2: funct3 | 14:12 | 
+R3: rs1 | 19:15 | 
+R4: rs2 | 24:20 | 
+R5: imm[11:5] | 31:25 | 
+R6: imm[4:0] | 11:7 | 
+
+--- TABLE 3 ---
+R0: Run | Eq | Sequential PC | Target PC | PCSel | Observed PC
+R1: x11=12 |  |  |  |  | 
+R2: x11=9 |  |  |  |  | 
+
+--- TABLE 4 ---
+R0: Case | Prediction and fault | First wrong effect | Clean comparison
+R1: A |  |  | 
+R2: B |  |  | 
+R3: C |  |  | 
+
+--- TABLE 5 ---
+R0: Quantity | Before optimization | After optimization
+R1: Load path in ps |  | 
+R2: Add path in ps |  | 
+R3: Branch path in ps |  | 
+R4: Fixed period in ps |  | 
+R5: Frequency in GHz |  | 
+R6: 100 instruction time in ns |  | 
